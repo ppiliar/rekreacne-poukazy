@@ -2,7 +2,7 @@
   <el-container>
     <el-header>
       <div class="controls">
-        <el-button type="primary" icon="el-icon-arrow-left" v-on:click="back">Spat</el-button>
+        <el-button type="primary" icon="el-icon-arrow-left" v-on:click="back">Späť</el-button>
       </div>
     </el-header>
     <el-main>
@@ -14,13 +14,13 @@
         class="form-inline"
       >
         <el-form-item label="Meno" prop="meno">
-          <el-input v-model="formInline.meno" placeholder="Meno"></el-input>
+          <el-input v-model="formInline.meno"></el-input>
         </el-form-item>
         <el-form-item label="Priezvisko" prop="priezvisko">
-          <el-input v-model="formInline.priezvisko" placeholder="Priezvisko"></el-input>
+          <el-input v-model="formInline.priezvisko"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" v-on:click="submitForm('formInline')">Pridat</el-button>
+          <el-button type="primary" v-on:click="submitForm('formInline')">Pridať</el-button>
         </el-form-item>
       </el-form>
       <el-row id="alerts">
@@ -32,7 +32,7 @@
 
 <script>
 import { bus } from "../main.js";
-import db from "../scripts/db1.js";
+import db from "../scripts/db.js";
 import { clearInterval } from 'timers';
 
 export default {
@@ -79,7 +79,6 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          console.log("form valid");
           try{
           db.addZamestnanec(this.formInline.meno, this.formInline.priezvisko);
           this.createAlert("success");
@@ -99,15 +98,15 @@ export default {
 
       switch(type) {
         case "success": 
-          self.title = "Uspesne pridane: " + form.meno + " " + form.priezvisko;
+          self.title = "Úspešne pridané: " + form.meno + " " + form.priezvisko;
           self.type = "success";
           break;
         case "fail":
-          self.title = "Neuspesne: "+ form.meno + " " + form.priezvisko + " uz existuje";
+          self.title = "Neúspešné: "+ form.meno + " " + form.priezvisko + " uź existuje";
           self.type = "error";
           break;
         case "input":
-          self.title = "Nespravne zadane udaje";
+          self.title = "Nesprávne zadané údaje";
           self.type = "warning";
           break;
         default:
@@ -122,15 +121,6 @@ export default {
     }
   }
 };
-
-function sanitizeString(str) {
-  //str = str.replace(/[^a-z0-9 \.,_-]/gim,"");
-  str = str.replace(
-    /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/gim,
-    ""
-  );
-  return str.trim();
-}
 </script>
 
 <style>

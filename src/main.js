@@ -8,7 +8,7 @@ Vue.use(ElementUI, {locale});
 import App from './App.vue';
 import { getUserDataPath } from './scripts/controller.js';
 
-import  db from './scripts/db1.js'; 
+import  db from './scripts/db.js'; 
 db.init(getUserDataPath());
 
 Vue.config.productionTip = false;

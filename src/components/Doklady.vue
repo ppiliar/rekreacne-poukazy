@@ -2,8 +2,8 @@
   <el-container>
     <el-header>
       <div class="controls">
-        <el-button type="primary" icon="el-icon-arrow-left" v-on:click="back">Spat</el-button>
-        <el-button v-on:click="add">Pridat</el-button>
+        <el-button type="primary" icon="el-icon-arrow-left" v-on:click="back">Späť</el-button>
+        <el-button v-on:click="add" icon="el-icon-plus">Pridať</el-button>
       </div>
     </el-header>
     <el-main>
@@ -13,45 +13,51 @@
           <el-row>
             <el-col :span="24"><h1 class="bold">{{ zamestnanec.Meno }} {{ zamestnanec.Priezvisko}}</h1></el-col>
           </el-row>
-            <el-row>
-            <el-col :span="12">
-          <h2>Suma celkom:</h2> </el-col><el-col :span="12"> <h1>{{ celkSuma }}</h1>
+            <el-row :gutter="10">
+            <el-col :span="16"><h2>Cena zájazdov celkom:</h2></el-col>
+            <el-col :span="8"> <h1>{{ celkSuma }}</h1>
           </el-col>
+          </el-row >
+          <el-row :gutter="10">
+            <el-col :span="16"><h1>Celkovo preplatene:</h1></el-col>
+            <el-col :span="8"><h1>{{celkPrep}}</h1></el-col>
           </el-row>
-          <el-row>
-            <el-col :span="12"><h1>Celkovo preplatene:</h1></el-col>
-            <el-col :span="12"><h1>{{celkPrep}}</h1></el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="12"><h1>Mozne preplatit:</h1></el-col>
-            <el-col :span="12"><h1>{{ 275 - celkPrep }}</h1></el-col>
+          <el-row :gutter="10">
+            <el-col :span="16"><h1>Možné preplatiť:</h1></el-col>
+            <el-col :span="8"><h1>{{ 275 - celkPrep }}</h1></el-col>
           </el-row>          
         </div>
         </el-col>
         <el-col :span="12">
           <div class="dashboard">
-            <el-row>
+            <el-row :gutter="10">
               <el-col :span="12">
                 <el-progress type="circle" :percentage="percent"></el-progress>
               </el-col>
               <el-col :span="12">
-                <div class="progress">{{ celkPrep }} / 275 </div>
+                <div class="progress">{{ celkPrep }} / 275</div>
               </el-col>
             </el-row>
-          <!-- <div class="bar">
-            <div class="progress" v-bind:style="{'background':'#0288d1', 'width':'24'+'%'}"></div>
-            <span class="percent">24%</span>
-          </div> -->
           </div>
         </el-col>
       </el-row>
       <div class="table">
         <el-table :data="tableData" style="width: 100%" :cell-class-name="tableCellClassName">
-          <el-table-column prop="Suma" label="Suma"></el-table-column>
-          <el-table-column prop="Preplatene" label="Preplatene"></el-table-column>
-          <el-table-column prop="Schvalene" label="Schvalene" width="100"></el-table-column>     
-          <el-table-column prop="Poznamka" label="Poznamka"></el-table-column>
-          <el-table-column prop="Controls" align="left" class="search">
+          <el-table-column prop="Suma" label="Cena zájazdu" width="120"></el-table-column>
+          <el-table-column prop="Preplatene" label="Preplatené" width="120"></el-table-column>
+          <el-table-column prop="Schvalene" label="Schválené" width="100"></el-table-column>     
+          <el-table-column prop="Poznamka" label="Poznámka" width="200"></el-table-column>
+          <el-table-column prop="Controls" align="right">
+            <template v-slot:header>
+              <el-select v-model="rok" size="small">
+                <el-option
+                v-for="item in roky"
+                :key="item"
+                :label="item"
+                :value="item">
+                </el-option>
+              </el-select>
+            </template>
             <template v-slot="scope">
               <el-button type="warning" icon="el-icon-edit" circle v-on:click="edit(scope.row.ID)"></el-button>
               <el-button type="danger" icon="el-icon-delete" circle v-on:click="remove(scope.row.ID)"></el-button>
@@ -66,7 +72,7 @@
 
 <script>
 import { bus } from "../main.js";
-import db from "../scripts/db1.js";
+import db from "../scripts/db.js";
 
 export default {
   name: "doklady",
@@ -74,14 +80,14 @@ export default {
   data() {
     return {
       zamestnanec: db.getZamestnanec(this.compData),
-      tableData: db.getDoklady(this.compData)
+      tableData: "",
+      rok: this.getCurrentYear()
     };
   },
   computed: {
     celkSuma: function() {
       var sum = 0;
       this.tableData.forEach(function(element) {
-        //TODO if not number
         if(typeof(element.Suma) === 'number'){
         sum += parseFloat(element.Suma);
         }
@@ -99,22 +105,23 @@ export default {
       var perc = this.celkPrep/275;
       return Math.floor(perc*100);
     },
-    schvaleneIcon: function(column) {
-      console.log("row:",column);
-      if(column == "ok"){
-        console.log("ok");
-      }
-      // switch(row) {
-      //   case "ok": return "el-icon-success";
-      //   default: return "el-icon-error";
-      // };
+    roky: function() {
+      var currentYear = new Date().getFullYear(), years = [];
+      var startYear = 2019;  
+      while ( startYear <= currentYear ) {
+          years.push(startYear++);
+      }   
+      return years;
     }
   },
-  created() {
-    fetchZamData();
-    console.log(this.zamestnanec);
+  watch:{
+    rok: function() {
+        this.updateTable();
+    }
   },
-  components: {},
+  created: function(){
+    this.tableData = db.getDoklady(this.compData, this.rok);
+  },
   methods: {
     back: function() {
       bus.$emit("switchComp", "Zamestnanci");
@@ -131,7 +138,7 @@ export default {
       bus.$emit("switchComp", "DokladyEdit", data);
     },
     updateTable: function() {
-      this.tableData = db.getDoklady(this.compData);
+      this.tableData = db.getDoklady(this.compData, this.rok);
     },
     tableCellClassName({row, column, rowIndex, columnIndex}) {
       if(columnIndex === 2){
@@ -151,13 +158,14 @@ export default {
         default: break;
       }
     },
+    getCurrentYear: function() {
+      return new Date().getFullYear();
+    },
   }
 };
 
 function fetchZamData(id) {
   var zamData = db.getZamData(id);
-  //console.log(zamData);
-  //return zamData;
 }
 </script>
 
@@ -211,10 +219,6 @@ function fetchZamData(id) {
   overflow: hidden;
   padding: 5px;
 }
-.progress {
-  float: left;
-  padding: 15px;
-}
 .percent {
   float: right;
   font-weight: 600;
@@ -235,10 +239,13 @@ function fetchZamData(id) {
   font-weight: bold;
 }
 .progress {
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  padding: 15px;
+}
+.el-input__icon{
+  width:35px;
 }
 </style>

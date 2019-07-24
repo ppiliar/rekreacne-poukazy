@@ -1,7 +1,8 @@
 {
-  "name": "my-project",
-  "version": "0.1.0",
-  "description": "Element vue app",
+  "name": "rekreacne-poukazy",
+  "version": "0.1.1",
+  "productName": "Rekreačné poukazy",
+  "description": "Aplikácia na spravovanie rekreačných poukazov",
   "author": "Peter Piliar",
   "private": true,
   "scripts": {

@@ -2,7 +2,7 @@
   <el-container>
     <el-header>
       <div class="controls">
-        <el-button type="primary" icon="el-icon-arrow-left" v-on:click="back">Spat</el-button>
+        <el-button type="primary" icon="el-icon-arrow-left" v-on:click="back">Späť</el-button>
       </div>
     </el-header>
     <el-main>
@@ -20,7 +20,7 @@
           <el-input v-model="formInline.priezvisko"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" v-on:click="submitForm('formInline')">Ulozit</el-button>
+          <el-button type="primary" v-on:click="submitForm('formInline')">Uložiť</el-button>
         </el-form-item>
       </el-form>
       <el-row id="alerts">
@@ -32,7 +32,7 @@
 
 <script>
 import { bus } from "../main.js";
-import db from "../scripts/db1.js";
+import db from "../scripts/db.js";
 import { clearInterval } from 'timers';
 
 export default {
@@ -83,7 +83,6 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          console.log("form valid");
           try{
           db.addZamestnanec(this.formInline.meno, this.formInline.priezvisko);
           this.createAlert("success");
@@ -103,15 +102,15 @@ export default {
 
       switch(type) {
         case "success": 
-          self.title = "Uspesne pridane: " + form.meno + " " + form.priezvisko;
+          self.title = "Uspesne zmenené: ";
           self.type = "success";
           break;
         case "fail":
-          self.title = "Neuspesne: "+ form.meno + " " + form.priezvisko + " uz existuje";
+          self.title = "Neúspešné: osoba už existuje";
           self.type = "error";
           break;
         case "input":
-          self.title = "Nespravne zadane udaje";
+          self.title = "Nesprávne zadané údaje";
           self.type = "warning";
           break;
         default:

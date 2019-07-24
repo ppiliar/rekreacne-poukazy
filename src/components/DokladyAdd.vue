@@ -2,12 +2,12 @@
   <el-container>
     <el-header>
       <div class="controls">
-        <el-button type="primary" icon="el-icon-arrow-left" v-on:click="back">Spat</el-button>
+        <el-button type="primary" icon="el-icon-arrow-left" v-on:click="back">Späť</el-button>
       </div>
     </el-header>
     <el-main>
-      <el-form :inline="true" :model="doklad" :rules="rules" ref="doklad" @submit.native.prevent>
-        <el-form-item label="Suma" prop="suma">
+      <el-form  :model="doklad" :rules="rules" ref="doklad" @submit.native.prevent>
+        <el-form-item label="Cena zájazdu" prop="suma">
           <el-input
             type="number"
             min="0"
@@ -18,7 +18,7 @@
             autofocus
           ></el-input>
         </el-form-item>
-        <el-form-item label="Mozne preplatit" prop="prep">
+        <el-form-item label="Možné preplatiť" prop="prep">
           <el-input v-model.number="prep" :disabled="true"></el-input>
         </el-form-item>
         <el-form-item>
@@ -30,11 +30,21 @@
             </el-radio-group>
           </div>
         </el-form-item>
-         <el-form-item label="Poznamka">
+         <el-form-item label="Poznámka">
           <el-input type="textarea" v-model="doklad.poznamka"></el-input>
         </el-form-item>
+        <el-form-item label="Rok">
+          <el-select v-model="doklad.rok">
+                <el-option
+                v-for="item in roky"
+                :key="item"
+                :label="item"
+                :value="item">
+                </el-option>
+              </el-select>
+        </el-form-item>
         <el-form-item>
-          <el-button type="primary" v-on:click="submitForm('doklad')">Pridat</el-button>
+          <el-button type="primary" v-on:click="submitForm('doklad')">Pridať</el-button>
         </el-form-item>
       </el-form>
       <el-row id="alerts">
@@ -52,7 +62,7 @@
 
 <script>
 import { bus } from "../main.js";
-import db from "../scripts/db1.js";
+import db from "../scripts/db.js";
 import { clearInterval } from "timers";
 
 export default {
@@ -60,9 +70,9 @@ export default {
   props: ["compData"],
   data() {
     var checkSuma = (rule, value, callback) => {
-      if(!value){ return callback(new Error("Zadaj cislo")); }
+      if(!value){ return callback(new Error("Zadaj číslo")); }
       if (value < 0) {
-        return callback(new Error("Cislo nemoze byt zaporne"));
+        return callback(new Error("Číslo nemôže byť záporné"));
       } else {
         callback();
       }
@@ -73,7 +83,8 @@ export default {
       doklad: {
         suma: "",
         schvalene: "Čakajúce",
-        poznamka: ""
+        poznamka: "",
+        rok: this.getCurrentYear()
       },
       alert: {
         showAlert: false,
@@ -91,6 +102,14 @@ export default {
         return 0;
       } 
       return this.getPrep(this.doklad.suma);
+    },
+    roky: function() {
+      var currentYear = new Date().getFullYear(), years = [];
+      var startYear = 2019;  
+      while ( startYear <= currentYear ) {
+          years.push(startYear++);
+      }   
+      return years;
     }
   },
   components: {},
@@ -106,11 +125,9 @@ export default {
           try {
             var doklad = this.doklad;
             var prep = this.getPrep(this.doklad.suma);
-            console.log(prep);
-            db.addDoklad(doklad.suma, prep, doklad.schvalene, doklad.poznamka, this.compData);
+            db.addDoklad(doklad.suma, prep, doklad.schvalene, doklad.poznamka, doklad.rok, this.compData);
             this.createAlert("success");
           } catch (e) {
-            console.log(e);
             this.createAlert("fail");
           }
           this.$refs[formName].resetFields();
@@ -125,15 +142,15 @@ export default {
 
       switch (type) {
         case "success":
-          self.title = "Uspesne pridane";
+          self.title = "Úspešne pridané";
           self.type = "success";
           break;
         case "fail":
-          self.title = "Neuspesne";
+          self.title = "Neúspešné";
           self.type = "error";
           break;
         case "input":
-          self.title = "Nespravne zadane udaje";
+          self.title = "Nesprávne zadané údaje";
           self.type = "warning";
           break;
         default:
@@ -147,26 +164,20 @@ export default {
       }, 10000);
     },
     getPrep(suma) {
-      var doklady = db.getDoklady(this.compData);
+      var doklady = db.getDoklady(this.compData, this.doklad.rok);
       var prepSum = 0;
       var prep = round(suma * 0.55);
       doklady.forEach(function(doklad) {
         prepSum += doklad.Preplatene;
       });
-      console.log(prep);
-      console.log(
-        "prep+prepSum = %s + %f = %f ",
-        prep,
-        prepSum,
-        prep + prepSum
-      );
       if (prepSum + prep > 275) {
-        console.log("returning 275-sum " + (275 - prepSum));
         return 275 - prepSum;
       } else {
-        console.log("returning prep:" + prep);
         return prep;
       }
+    },
+    getCurrentYear: function() {
+      return new Date().getFullYear();
     }
   }
 };

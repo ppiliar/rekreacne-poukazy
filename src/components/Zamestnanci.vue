@@ -2,9 +2,7 @@
   <el-container direction="vertical">
     <el-header>
       <div class="controls">
-        <el-button class="control-button" v-on:click="add">Pridat</el-button>
-        <!-- <el-button class="control-button" v-on:click="refresh">Refresh</el-button>
-        <el-button class="control-button" v-on:click="removeAll">Remove All</el-button> -->
+        <el-button class="control-button" v-on:click="add" icon="el-icon-plus">Pridať</el-button>
       </div>
     </el-header>
     <el-main>
@@ -16,8 +14,7 @@
         >
           <el-table-column prop="Meno" label="Meno" width="180"></el-table-column>
           <el-table-column prop="Priezvisko" label="Priezvisko" width="180"></el-table-column>
-          <!-- <el-table-column prop="ID" label="Id" style="display:none;"></el-table-column> -->
-          <el-table-column prop="Controls" align="left" class="search">
+          <el-table-column prop="Controls" align="right" class="search">
             <template v-slot:header>
               <el-input v-model="search" size="mini" placeholder="Vyhľadať"/>
             </template>
@@ -35,26 +32,17 @@
 </template>
 
 <script>
-import { DbModel } from "../scripts/db.js";
-import { getUserDataPath, createWindow } from "../scripts/controller.js";
+import db from "../scripts/db.js";
+import { getUserDataPath } from "../scripts/controller.js";
 import { bus } from "../main.js";
-
-const db = new DbModel(getUserDataPath());
-//var result = db.getAll();
-//console.log(result);
 
 export default {
   name: "zamestnanci",
   data() {
     return {
-      tableData: db.getAll(),
+      tableData: db.getZamestnanci(),
       search: ""
     };
-  },
-  watch: {
-    tableData: function(value) {
-      console.log("result changed");
-    }
   },
   methods: {
     add: function() {
@@ -63,24 +51,32 @@ export default {
     edit: function(id){ 
       bus.$emit("switchComp", "ZamestnanciEdit", id);
     },
-    refresh: function() {
-      console.log(db.getAll());
-      this.updateTable();
-    },
-    removeAll: function() {
-      db.removeAll();
-      this.updateTable();
-    },
     remove: function(id) {
-      db.remove(id);
-      this.updateTable();
+      let zam = db.getZamestnanec(id);
+      let msg = zam.Meno + " " + zam.Priezvisko;
+      this.deleteBox(id, msg);
     },
     doklady: function(id) {
       bus.$emit("switchComp", "Doklady", id);
-      console.log("doklady");
     },
     updateTable: function() {
-      this.tableData = db.getAll();
+      this.tableData = db.getZamestnanci();
+    },
+    deleteBox: function(id, msg) {
+      const {remote} = require('electron')
+      const dialog   = remote.dialog
+
+      let win = remote.getCurrentWindow()
+
+      let options = {}
+      options.buttons = ["&Áno","&Nie"]
+      options.message = "Naozaj odstrániť " + msg;
+      dialog.showMessageBox(win, options, res => {
+        if (res === 0) {
+          db.removeZamestnanec(id);
+          this.updateTable();
+        }
+      })
     }
   }
 };
