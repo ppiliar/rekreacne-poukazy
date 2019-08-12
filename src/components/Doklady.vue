@@ -5,6 +5,9 @@
         <el-button type="primary" icon="el-icon-arrow-left" v-on:click="back">Späť</el-button>
         <el-button v-on:click="add" icon="el-icon-plus">Pridať</el-button>
       </div>
+      <div class="controls-right">
+        <el-button v-on:click="print" icon="el-icon-printer">Tlačiť</el-button>
+      </div>
     </el-header>
     <el-main>
       <el-row :gutter="20">
@@ -24,7 +27,7 @@
           </el-row>
           <el-row :gutter="10">
             <el-col :span="16"><h1>Možné preplatiť:</h1></el-col>
-            <el-col :span="8"><h1>{{ 275 - celkPrep }}</h1></el-col>
+            <el-col :span="8"><h1>{{ moznePrep }}</h1></el-col>
           </el-row>          
         </div>
         </el-col>
@@ -43,10 +46,11 @@
       </el-row>
       <div class="table">
         <el-table :data="tableData" style="width: 100%" :cell-class-name="tableCellClassName">
-          <el-table-column prop="Suma" label="Cena zájazdu" width="120"></el-table-column>
-          <el-table-column prop="Preplatene" label="Preplatené" width="120"></el-table-column>
+          <el-table-column prop="Suma" label="Cena zájazdu" width="100"></el-table-column>
+          <el-table-column prop="Datum" label="Dátum schválenia" width="100"></el-table-column>
+          <el-table-column prop="Preplatene" label="Preplatené" width="100"></el-table-column>
           <el-table-column prop="Schvalene" label="Schválené" width="100"></el-table-column>     
-          <el-table-column prop="Poznamka" label="Poznámka" width="200"></el-table-column>
+          <el-table-column class="poznamka" prop="Poznamka" label="Poznámka" width="200"></el-table-column>
           <el-table-column prop="Controls" align="right">
             <template v-slot:header>
               <el-select v-model="rok" size="small">
@@ -92,14 +96,18 @@ export default {
         sum += parseFloat(element.Suma);
         }
       });
-      return sum;
+      return sum.toFixed(2);
     },
     celkPrep: function() {
       var sum = 0;
       this.tableData.forEach(function(element) {
         sum += element.Preplatene;
       });
-      return sum;
+      return sum.toFixed(2);
+    },
+    moznePrep: function() {
+      var sum = 275 - this.celkPrep;
+      return sum.toFixed(2);
     },
     percent: function() {
       var perc = this.celkPrep/275;
@@ -137,11 +145,15 @@ export default {
       var data = { zamId: this.compData, dokladId: id };
       bus.$emit("switchComp", "DokladyEdit", data);
     },
+    print: function() {
+      const ipc = require('electron').ipcRenderer;
+      ipc.send('print-to-pdf');
+    },
     updateTable: function() {
       this.tableData = db.getDoklady(this.compData, this.rok);
     },
     tableCellClassName({row, column, rowIndex, columnIndex}) {
-      if(columnIndex === 2){
+      if(column.label === "Schválené"){
         switch(row.Schvalene){
           case "Schválené": return 'success';
           case "Čakajúce": return 'warning';
@@ -202,6 +214,14 @@ function fetchZamData(id) {
   align-items: left;
   line-height: 60px;
 }
+/* nerozdelovat slova na konci riadku */
+.el-table .cell {
+  word-break: break-word;
+}
+.el-table .el-header {
+  word-break: break-word;
+}
+
 .input-label {
   display: inline-block;
   width: 130px;
@@ -247,5 +267,11 @@ function fetchZamData(id) {
 }
 .el-input__icon{
   width:35px;
+}
+.controls-right {
+  width: 100%;
+  display:flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 </style>

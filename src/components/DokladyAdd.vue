@@ -125,9 +125,15 @@ export default {
           try {
             var doklad = this.doklad;
             var prep = this.getPrep(this.doklad.suma);
-            db.addDoklad(doklad.suma, prep, doklad.schvalene, doklad.poznamka, doklad.rok, this.compData);
+            if((doklad.schvalene == "Schválené") || (doklad.schvalene == "Zamietnuté")) {
+              let datum = this.getCurrentDate();
+              db.addDoklad(doklad.suma, prep, datum, doklad.schvalene, doklad.poznamka, doklad.rok, this.compData);
+            } else {
+              db.addDoklad(doklad.suma, prep, '-', doklad.schvalene, doklad.poznamka, doklad.rok, this.compData);
+            }
             this.createAlert("success");
           } catch (e) {
+            console.log(e);
             this.createAlert("fail");
           }
           this.$refs[formName].resetFields();
@@ -178,6 +184,15 @@ export default {
     },
     getCurrentYear: function() {
       return new Date().getFullYear();
+    },
+    getCurrentDate: function() {
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, '0');
+      var mm = String(today.getMonth() + 1).padStart(2, '0'); 
+      var yyyy = today.getFullYear();
+
+      today = dd + '/' + mm + '/' + yyyy;
+      return today;
     }
   }
 };

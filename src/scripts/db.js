@@ -25,10 +25,15 @@ export default {
         if (rslt.length==0) {
             console.log("create table");
             this.db.prepare("CREATE TABLE Zamestnanci (Meno	TEXT NOT NULL, Priezvisko TEXT NOT NULL, ID	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE);").run();
-            this.db.prepare("CREATE TABLE Doklady (Suma	NUMERIC NOT NULL, Preplatene NUMERIC, ZAM_ID INTEGER,Schvalene	INTEGER,Poznamka TEXT, "+
-            " Rok INTEGER NOT NULL, ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, "+
+            this.db.prepare("CREATE TABLE Doklady (Suma	NUMERIC NOT NULL, Preplatene NUMERIC, Datum TEXT, Schvalene TEXT, Poznamka TEXT, "+
+            " Rok INTEGER NOT NULL, ZAM_ID INTEGER NOT NULL, ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, "+
             "FOREIGN KEY(ZAM_ID) REFERENCES Zamestnanci(ID) ON DELETE CASCADE);").run();
-            
+        } else {
+            const alt = this.db.pragma('table_info(Doklady)');
+            if(alt.length < 8) {
+                this.db.prepare("ALTER TABLE Doklady ADD COLUMN Datum TEXT DEFAULT '-';").run();
+                console.log("add column datum");
+            }
         }
     },
 
@@ -42,10 +47,9 @@ export default {
             throw "Entry already exists"
         }
     },
-
-    addDoklad(suma, preplatene, schvalene, poznamka, rok, id) {
-        const stmt = this.db.prepare("INSERT INTO Doklady (Suma,Preplatene,Schvalene,Poznamka,Rok,ZAM_ID) VALUES (?,?,?,?,?,?);")
-        return stmt.run(suma,preplatene,schvalene,poznamka,rok,id);
+    addDoklad(suma, preplatene, datum, schvalene, poznamka, rok, id) {
+        const stmt = this.db.prepare("INSERT INTO Doklady (Suma,Preplatene,Datum,Schvalene,Poznamka,Rok,ZAM_ID) VALUES (?,?,?,?,?,?,?);")
+        return stmt.run(suma,preplatene,datum,schvalene,poznamka,rok,id);
     },
     removeDoklad(id){
         const stmt = this.db.prepare("DELETE FROM Doklady WHERE ID=?");
@@ -55,9 +59,10 @@ export default {
         const stmt = this.db.prepare("SELECT * FROM Doklady WHERE ID=?;");
         return stmt.get(id);
     },
-    updateDoklad(suma, preplatene, schvalene, poznamka, rok, id) {
-        const stmt = this.db.prepare("UPDATE Doklady SET Suma=?,Preplatene=?,Schvalene=?,Poznamka=?,Rok=? WHERE ID=?;")
-        return stmt.run(suma,preplatene,schvalene,poznamka,rok,id);
+    updateDoklad(suma, preplatene, datum, schvalene, poznamka, rok, id) {
+        console.log("db- updateDoklad")
+        const stmt = this.db.prepare("UPDATE Doklady SET Suma=?,Preplatene=?,Datum=?,Schvalene=?,Poznamka=?,Rok=? WHERE ID=?;")
+        return stmt.run(suma,preplatene,datum,schvalene,poznamka,rok,id);
     },
     getDoklady(zam_id, rok) {
         const stmt = this.db.prepare("SELECT * FROM Doklady WHERE ZAM_ID=? AND Rok=?;");

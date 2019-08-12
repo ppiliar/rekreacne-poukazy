@@ -93,6 +93,7 @@ export default {
       meno: "",
       priezvisko: "",
       doklad: db.getDoklad(this.compData.dokladId),
+      changedStatus: false,
       alert: {
         showAlert: false,
         title: "",
@@ -115,6 +116,14 @@ export default {
     },
     preplatene: function() {
       return this.getPrep(this.doklad.Suma);
+    },
+    schvalene: function() {
+      return this.doklad.Schvalene;
+    }
+  },
+  watch: {
+    schvalene: function () {
+      this.changedStatus = true;
     }
   },
   methods: {
@@ -128,8 +137,16 @@ export default {
           try {
             var doklad = this.doklad;
             doklad.Preplatene = this.preplatene;
+            console.log("140")
             if(doklad.Schvalene === "Zamietnuté") { doklad.Preplatene = 0; }
-            db.updateDoklad(doklad.Suma, doklad.Preplatene, doklad.Schvalene, doklad.Poznamka, doklad.Rok, doklad.ID);
+            console.log("142")
+            console.log(this.changedStatus);
+            if(this.changedStatus) {
+              console.log("changedStatus == true");
+              db.updateDoklad(doklad.Suma, doklad.Preplatene, this.getCurrentDate(), doklad.Schvalene, doklad.Poznamka, doklad.Rok, doklad.ID);
+            } else {
+              db.updateDoklad(doklad.Suma, doklad.Preplatene, '-', doklad.Schvalene, doklad.Poznamka, doklad.Rok, doklad.ID);
+            }
             this.createAlert("success");
           } catch (e) {
             this.createAlert("fail");
@@ -145,7 +162,7 @@ export default {
       var self = this.alert;
       switch (type) {
         case "success":
-          self.title = "Úspešne pridané";
+          self.title = "Úspešne upravené";
           self.type = "success";
           break;
         case "fail":
@@ -187,6 +204,15 @@ export default {
     },
     getCurrentYear: function() {
       return new Date().getFullYear();
+    },
+    getCurrentDate: function() {
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, '0');
+      var mm = String(today.getMonth() + 1).padStart(2, '0'); 
+      var yyyy = today.getFullYear();
+
+      today = dd + '/' + mm + '/' + yyyy;
+      return today;
     }
   }
 };

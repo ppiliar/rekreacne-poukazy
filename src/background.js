@@ -8,6 +8,14 @@ import {
 import db from './scripts/db';
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
+// const used for pdf print
+const path = require('path')
+const fs = require('fs')
+const os = require('os')
+const electron = require('electron')
+const ipc = electron.ipcMain
+const shell = electron.shell
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
@@ -21,7 +29,7 @@ function createWindow () {
     title: 'Rekreačné poukazy',
     webPreferences: {
     nodeIntegration: true,
-    devTools: false
+    devTools: false //vypnut devTools pri production builde
   } })
 
   win.on('page-title-updated', (evt) => {
@@ -92,3 +100,19 @@ if (isDevelopment) {
     })
   }
 }
+
+
+ipc.on('print-to-pdf', function(event) {
+  const pdfPath = path.join(os.tmpdir(), 'print.pdf');
+  const win = BrowserWindow.fromWebContents(event.sender);
+
+  win.webContents.printToPDF({}, function(error, data){
+      if(error) return console.log(error.message);
+
+      fs.writeFile(pdfPath, data, function(err) {
+          if(err) return console.log(err.message);
+          shell.openExternal('file://'+pdfPath);
+          event.sender.send('wrote-pdf', pdfPath);
+      })
+  })
+});
