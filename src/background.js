@@ -23,6 +23,14 @@ let win
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true, standard: true } }])
 
+// Change default appData location to startup location of portable app
+import checkAppDataFolder from './scripts/fileUtil'
+app.setPath("appData", process.env.PORTABLE_EXECUTABLE_DIR)
+let portablePath = path.join(process.env.PORTABLE_EXECUTABLE_DIR, app.getName())
+console.log(portablePath)
+checkAppDataFolder(portablePath)
+app.setPath("userData", portablePath)
+
 function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({ width: 900, height: 600, 

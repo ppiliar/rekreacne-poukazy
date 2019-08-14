@@ -14,9 +14,17 @@ function ensureExists(path, mask, cb) {
     });
 }
 
-export default function checkDataFiles(userDataPath){
-    var dataFolder = path.join(userDataPath,"data");
-    ensureExists(dataFolder, (err) => {
-        if (err) throw err;
-    });
+export default {
+    checkDataFiles(userDataPath){
+        var dataFolder = path.join(userDataPath,"data");
+        ensureExists(dataFolder, (err) => {
+            if (err) throw err;
+        });
+    },
+    checkAppDataFolder(appDataPath){
+        var dataFolder = path.join(appDataPath);
+        ensureExists(dataFolder, (err) => {
+            if (err) throw err;
+        });
+    }
 }
