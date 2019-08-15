@@ -33,7 +33,6 @@
 
 <script>
 import db from "../scripts/db.js";
-import { getUserDataPath } from "../scripts/controller.js";
 import { bus } from "../main.js";
 
 export default {

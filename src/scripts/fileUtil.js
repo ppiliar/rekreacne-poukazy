@@ -14,17 +14,28 @@ function ensureExists(path, mask, cb) {
     });
 }
 
-export default {
-    checkDataFiles(userDataPath){
-        var dataFolder = path.join(userDataPath,"data");
-        ensureExists(dataFolder, (err) => {
-            if (err) throw err;
-        });
-    },
-    checkAppDataFolder(appDataPath){
-        var dataFolder = path.join(appDataPath);
-        ensureExists(dataFolder, (err) => {
-            if (err) throw err;
-        });
+export function checkDataFiles(userDataPath){
+    var dataFolder = path.join(userDataPath,"data");
+    ensureExists(dataFolder, (err) => {
+        if (err) throw err;
+    });
+}
+
+export function createPortableAppDataFolder(portableAppDataPath) {
+    var dataFolder = path.join(portableAppDataPath);
+    ensureExists(dataFolder, (err) => {
+        if (err) throw err;
+    });
+}
+
+export function copyFromRoaming(userDataPath, portableAppDataPath) {
+    let dbPath = path.join(userDataPath, "data", "rekredb.db"); 
+    let newPath = path.join(portableAppDataPath, "rekredb.db");
+    
+    if (!fs.existsSync(newPath) && fs.existsSync(dbPath)) {
+        fs.copyFile(dbPath, newPath, (err) => {
+            if(err) throw err;
+            console.log("Db copied to portable location")
+        })
     }
 }

@@ -6,10 +6,14 @@ import locale from 'element-ui/lib/locale/lang/en';
 
 Vue.use(ElementUI, {locale});
 import App from './App.vue';
-import { getUserDataPath } from './scripts/controller.js';
 
+// db initialization
+// if this is in background, it is not properly loaded before start of vue 
+// causing vue to fail load data
 import  db from './scripts/db.js'; 
-db.init(getUserDataPath());
+const electron = require('electron');
+const userDataPath = (electron.app || electron.remote.app).getPath('userData');
+db.init(userDataPath)
 
 Vue.config.productionTip = false;
 

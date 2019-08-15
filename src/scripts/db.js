@@ -6,9 +6,11 @@ export default {
     init(userDataPath) {
         if(this.db == null){
             var dbName = "rekredb.db";
-            var dbPath = path.join(userDataPath, "data", dbName);
+            //var dbPath = path.join(userDataPath, "data", dbName);
+            var dbPath = path.join(userDataPath, dbName);
             console.log("db.js path: " + dbPath);
             var db = new sqlite3(dbPath, { verbose: console.log });
+            console.log(db);
             this.db = db;
             this.checkTables();
             console.log("db opened");
@@ -29,6 +31,7 @@ export default {
             " Rok INTEGER NOT NULL, ZAM_ID INTEGER NOT NULL, ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, "+
             "FOREIGN KEY(ZAM_ID) REFERENCES Zamestnanci(ID) ON DELETE CASCADE);").run();
         } else {
+            //TODO remove in 0.1.3
             const alt = this.db.pragma('table_info(Doklady)');
             if(alt.length < 8) {
                 this.db.prepare("ALTER TABLE Doklady ADD COLUMN Datum TEXT DEFAULT '-';").run();

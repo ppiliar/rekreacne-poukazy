@@ -16,6 +16,16 @@ const electron = require('electron')
 const ipc = electron.ipcMain
 const shell = electron.shell
 
+// Change default appData location to startup location of portable app
+import { createPortableAppDataFolder, copyFromRoaming } from './scripts/fileUtil'
+if(!isDevelopment){
+  let portablePath = path.join(process.env.PORTABLE_EXECUTABLE_DIR, "rekreacne-data")
+  createPortableAppDataFolder(portablePath)
+  copyFromRoaming(app.getPath('userData'), portablePath) // copy exitsing db from not portable installation
+  app.setPath("appData", process.env.PORTABLE_EXECUTABLE_DIR)
+  app.setPath("userData", portablePath)
+}
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
@@ -23,13 +33,6 @@ let win
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true, standard: true } }])
 
-// Change default appData location to startup location of portable app
-import checkAppDataFolder from './scripts/fileUtil'
-app.setPath("appData", process.env.PORTABLE_EXECUTABLE_DIR)
-let portablePath = path.join(process.env.PORTABLE_EXECUTABLE_DIR, app.getName())
-console.log(portablePath)
-checkAppDataFolder(portablePath)
-app.setPath("userData", portablePath)
 
 function createWindow () {
   // Create the browser window.
@@ -37,7 +40,7 @@ function createWindow () {
     title: 'Rekreačné poukazy',
     webPreferences: {
     nodeIntegration: true,
-    devTools: false //vypnut devTools pri production builde
+    //devTools: false //vypnut devTools pri production builde
   } })
 
   win.on('page-title-updated', (evt) => {
