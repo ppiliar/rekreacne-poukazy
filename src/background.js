@@ -22,7 +22,7 @@ if(!isDevelopment){
   let portablePath = path.join(process.env.PORTABLE_EXECUTABLE_DIR, "rekreacne-data")
   createPortableAppDataFolder(portablePath)
   copyFromRoaming(app.getPath('userData'), portablePath) // copy exitsing db from not portable installation
-  app.setPath("appData", process.env.PORTABLE_EXECUTABLE_DIR)
+  app.setPath("appData", portablePath)
   app.setPath("userData", portablePath)
 }
 
@@ -40,7 +40,7 @@ function createWindow () {
     title: 'Rekreačné poukazy',
     webPreferences: {
     nodeIntegration: true,
-    //devTools: false //vypnut devTools pri production builde
+    devTools: false //vypnut devTools pri production builde
   } })
 
   win.on('page-title-updated', (evt) => {
