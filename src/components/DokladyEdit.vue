@@ -119,6 +119,9 @@ export default {
     },
     schvalene: function() {
       return this.doklad.Schvalene;
+    },
+    doklady: function() {
+      return db.getDoklady(this.compData.zamId, this.doklad.Rok);
     }
   },
   watch: {
@@ -185,7 +188,7 @@ export default {
     },
     getPrep(suma) {
       var dokladId = this.compData.dokladId;
-      var doklady = db.getDoklady(this.compData.zamId, this.doklad.Rok);
+      var doklady = this.doklady;
       var prepSum = 0;
       var prep = round(suma * 0.55);
       doklady.forEach(function(doklad) {

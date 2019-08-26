@@ -110,6 +110,9 @@ export default {
           years.push(startYear++);
       }   
       return years;
+    },    
+    doklady: function() {
+      return db.getDoklady(this.compData, this.doklad.rok);
     }
   },
   components: {},
@@ -170,7 +173,7 @@ export default {
       }, 10000);
     },
     getPrep(suma) {
-      var doklady = db.getDoklady(this.compData, this.doklad.rok);
+      var doklady = this.doklady;
       var prepSum = 0;
       var prep = round(suma * 0.55);
       doklady.forEach(function(doklad) {
