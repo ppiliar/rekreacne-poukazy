@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/uhy8hmr1a01rgd08?svg=true)](https://ci.appveyor.com/project/ppiliar/rekreacne-poukazy)
+
 # Rekreačné-poukazy
 
 Electron aplikácia na evidenciu preplatených rekreačných poukazov 
