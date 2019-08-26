@@ -19,6 +19,8 @@ npm run electron:serve
 npm run electron:build
 ```
 
+## Pre-built binary for windows
+You can download pre-build binary [here](https://github.com/ppiliar/rekreacne-poukazy/releases/tag/v0.1.2)
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
