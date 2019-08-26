@@ -40,7 +40,7 @@ function createWindow () {
     title: 'Rekreačné poukazy',
     webPreferences: {
     nodeIntegration: true,
-    devTools: false //vypnut devTools pri production builde
+    devTools: false //disable devTools in production build
   } })
 
   win.on('page-title-updated', (evt) => {
