@@ -46,9 +46,9 @@
       </el-row>
       <div class="table">
         <el-table :data="tableData" style="width: 100%" :cell-class-name="tableCellClassName">
-          <el-table-column prop="Suma" label="Cena zájazdu" width="100"></el-table-column>
+          <el-table-column prop="Suma" label="Cena zájazdu" width="100" :formatter="sumaFormatter"></el-table-column>
           <el-table-column prop="Datum" label="Dátum schválenia" width="100"></el-table-column>
-          <el-table-column prop="Preplatene" label="Preplatené" width="100"></el-table-column>
+          <el-table-column prop="Preplatene" label="Preplatené" width="100" :formatter="prepFormatter"></el-table-column>
           <el-table-column prop="Schvalene" label="Schválené" width="100"></el-table-column>     
           <el-table-column class="poznamka" prop="Poznamka" label="Poznámka" width="200"></el-table-column>
           <el-table-column prop="Controls" align="right">
@@ -103,7 +103,7 @@ export default {
       this.tableData.forEach(function(element) {
         sum += element.Preplatene;
       });
-      return sum.toFixed(2);
+      return parseFloat(sum).toFixed(2);
     },
     moznePrep: function() {
       var sum = 275 - this.celkPrep;
@@ -173,6 +173,12 @@ export default {
     getCurrentYear: function() {
       return new Date().getFullYear();
     },
+    sumaFormatter: function(row, column) {
+      return parseFloat(row.Suma).toFixed(2);
+    },
+    prepFormatter: function(row, column) {
+      return parseFloat(row.Preplatene).toFixed(2);
+    }
   }
 };
 
