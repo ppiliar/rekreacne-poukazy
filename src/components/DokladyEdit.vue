@@ -12,13 +12,15 @@
             type="number"
             min="0"
             step="0.01"
-            v-model.number="doklad.Suma"
+            v-model="doklad.Suma"
+            v-on:blur="formatSuma()"
+            v-on:submit="formatSuma()"
             placeholder="Suma"
             @keyup.enter.native="submitForm('doklad')"
             autofocus
           ></el-input>
         </el-form-item>
-        <el-form-item label="Možné preplatiť" prop="Preplatene">
+        <el-form-item label="Možné preplatiť" prop="preplatene">
           <el-input type="number"
             min="0"
             step="0.01"
@@ -33,6 +35,10 @@
               <el-radio-button label="Zamietnuté">Zamietnuté</el-radio-button>
             </el-radio-group>
           </div>
+        </el-form-item>
+        <el-form-item>
+          <el-date-picker v-model="doklad.Datum" format="dd/MM/yyyy" value-format="dd/MM/yyyy">
+          </el-date-picker>
         </el-form-item>
          <el-form-item label="Poznámka">
           <el-input type="textarea" v-model="doklad.Poznamka"></el-input>
@@ -83,7 +89,9 @@ export default {
     };
     var checkPreplatene = (rule, value, callback) => {
       if (value === "") { return callback(new Error("Zadaj číslo")); }
-      if (value > (this.doklad.Suma*0.55)) {
+      if (value > (round(this.doklad.Suma*0.55))) {
+        console.log(value);
+        console.log(this.doklad.Suma + "*"+0.55 +"= "+ round(this.doklad.Suma*0.55));
         return callback(new Error("Preplatené je viac ako 55%"));
       } else {
         callback();
@@ -124,10 +132,16 @@ export default {
       return db.getDoklady(this.compData.zamId, this.doklad.Rok);
     }
   },
+  created: function() {
+    if(this.doklad.Datum == '-') {
+      console.log(this.doklad.Datum);
+      this.doklad.Datum = this.getCurrentDate();
+    }
+  },
   watch: {
     schvalene: function () {
       this.changedStatus = true;
-    }
+    },
   },
   methods: {
     back: function() {
@@ -140,18 +154,11 @@ export default {
           try {
             var doklad = this.doklad;
             doklad.Preplatene = this.preplatene;
-            console.log("140")
             if(doklad.Schvalene === "Zamietnuté") { doklad.Preplatene = 0; }
-            console.log("142")
-            console.log(this.changedStatus);
-            if(this.changedStatus) {
-              console.log("changedStatus == true");
-              db.updateDoklad(doklad.Suma, doklad.Preplatene, this.getCurrentDate(), doklad.Schvalene, doklad.Poznamka, doklad.Rok, doklad.ID);
-            } else {
-              db.updateDoklad(doklad.Suma, doklad.Preplatene, '-', doklad.Schvalene, doklad.Poznamka, doklad.Rok, doklad.ID);
-            }
+            db.updateDoklad(doklad.Suma, doklad.Preplatene, doklad.Datum, doklad.Schvalene, doklad.Poznamka, doklad.Rok, doklad.ID);
             this.createAlert("success");
           } catch (e) {
+            console.log(e);
             this.createAlert("fail");
           }
           this.doklad = db.getDoklad(this.compData.dokladId);
@@ -197,9 +204,9 @@ export default {
           }   
       });
       if (prepSum + prep > 275) {
-        return 275 - prepSum;
+        return round(275 - prepSum).toFixed(2);
       } else {
-        return prep;
+        return prep.toFixed(2);
       }
     },
     setPrep(){
@@ -216,6 +223,12 @@ export default {
 
       today = dd + '/' + mm + '/' + yyyy;
       return today;
+    },
+    formatSuma: function() {
+      var suma = this.doklad.Suma;
+      if(suma) {
+        this.doklad.Suma = parseFloat(suma).toFixed(2);
+      }
     }
   }
 };

@@ -10,10 +10,11 @@
         <!-- TODO: update this filter -->
         <el-table
           :data="tableData.filter(data => !search || data.Priezvisko.toLowerCase().includes(search.toLowerCase()) || data.Meno.toLowerCase().includes(search.toLowerCase()))"
+          :default-sort="{prop: 'Priezvisko', order: 'ascending'}"
           style="width: 100%"
         >
-          <el-table-column prop="Meno" label="Meno" width="180"></el-table-column>
-          <el-table-column prop="Priezvisko" label="Priezvisko" width="180"></el-table-column>
+          <el-table-column prop="Meno" label="Meno" width="180" sortable :sort-method="sortMeno"></el-table-column>
+          <el-table-column prop="Priezvisko" label="Priezvisko" width="180" sortable :sort-method="sortPriezvisko"></el-table-column>
           <el-table-column prop="Controls" align="right" class="search">
             <template v-slot:header>
               <el-input v-model="search" size="mini" placeholder="Vyhľadať"/>
@@ -77,6 +78,12 @@ export default {
           this.updateTable();
         }
       })
+    },
+    sortMeno: function(a, b) {
+      return a.Meno.localeCompare(b.Meno, "sk");
+    },
+    sortPriezvisko: function(a, b) {
+      return a.Priezvisko.localeCompare(b.Priezvisko, "sk");
     }
   }
 };

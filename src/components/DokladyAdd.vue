@@ -12,7 +12,9 @@
             type="number"
             min="0"
             step="0.01"
-            v-model.number="doklad.suma"
+            v-model="doklad.suma"
+            v-on:blur="formatSuma()"
+            v-on:submit="formatSuma()"
             placeholder="Suma"
             @keyup.enter.native="submitForm('doklad')"
             autofocus
@@ -180,9 +182,9 @@ export default {
         prepSum += doklad.Preplatene;
       });
       if (prepSum + prep > 275) {
-        return 275 - prepSum;
+        return round(275 - prepSum).toFixed(2);
       } else {
-        return prep;
+        return prep.toFixed(2);
       }
     },
     getCurrentYear: function() {
@@ -196,6 +198,12 @@ export default {
 
       today = dd + '/' + mm + '/' + yyyy;
       return today;
+    },
+    formatSuma: function() {
+      var suma = this.doklad.suma;
+      if(suma) {
+        this.doklad.suma = parseFloat(suma).toFixed(2);
+      }
     }
   }
 };
