@@ -50,6 +50,10 @@ export default {
             throw "Entry already exists"
         }
     },
+    editZamestnanec(meno, priezvisko, id) {
+        const stmt = this.db.prepare("UPDATE Zamestnanci SET Meno=?,Priezvisko=? WHERE ID=?;");
+        return stmt.run(meno, priezvisko, id);
+    },
     addDoklad(suma, preplatene, datum, schvalene, poznamka, rok, id) {
         const stmt = this.db.prepare("INSERT INTO Doklady (Suma,Preplatene,Datum,Schvalene,Poznamka,Rok,ZAM_ID) VALUES (?,?,?,?,?,?,?);")
         return stmt.run(suma,preplatene,datum,schvalene,poznamka,rok,id);
@@ -63,7 +67,6 @@ export default {
         return stmt.get(id);
     },
     updateDoklad(suma, preplatene, datum, schvalene, poznamka, rok, id) {
-        console.log("db- updateDoklad")
         const stmt = this.db.prepare("UPDATE Doklady SET Suma=?,Preplatene=?,Datum=?,Schvalene=?,Poznamka=?,Rok=? WHERE ID=?;")
         return stmt.run(suma,preplatene,datum,schvalene,poznamka,rok,id);
     },

@@ -58,6 +58,7 @@ export default {
         meno: "",
         priezvisko: ""
       },
+      zamestnanec: db.getZamestnanec(this.compData),
       alert: {
         showAlert: false,
         title: "Uspesne pridane",
@@ -84,9 +85,10 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           try{
-          db.addZamestnanec(this.formInline.meno, this.formInline.priezvisko);
-          this.createAlert("success");
+            db.editZamestnanec(this.formInline.meno, this.formInline.priezvisko, this.zamestnanec.ID);
+            this.createAlert("success");
           } catch(e) {
+            console.log(e);
             this.createAlert("fail");
           }
           this.$refs[formName].resetFields();
@@ -102,11 +104,11 @@ export default {
 
       switch(type) {
         case "success": 
-          self.title = "Uspesne zmenené: ";
+          self.title = "Úspešne zmenené: ";
           self.type = "success";
           break;
         case "fail":
-          self.title = "Neúspešné: osoba už existuje";
+          self.title = "Neúspešné: nepodarilo sa upraviť";
           self.type = "error";
           break;
         case "input":
