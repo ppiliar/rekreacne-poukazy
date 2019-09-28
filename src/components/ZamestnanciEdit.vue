@@ -84,8 +84,8 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           try{
-          db.addZamestnanec(this.formInline.meno, this.formInline.priezvisko);
-          this.createAlert("success");
+            db.editZamestnanec(this.formInline.meno, this.formInline.priezvisko, data.ID);
+            this.createAlert("success");
           } catch(e) {
             this.createAlert("fail");
           }
