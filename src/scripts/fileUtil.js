@@ -1,5 +1,8 @@
+import { createWriteStream } from 'fs';
+
 const path = require('path');
 const fs = require('fs');
+//const app = require('electron').remote.app;
 
 function ensureExists(path, mask, cb) {
     if (typeof mask == 'function') { // allow the `mask` parameter to be optional
@@ -38,4 +41,24 @@ export function copyFromRoaming(userDataPath, portableAppDataPath) {
             console.log("Db copied to portable location")
         })
     }
+}
+
+//TODO move async dialog to background.js or make async call writing after finished
+export async function writeFile(fileName, data) {
+    const electron = require('electron').remote;
+    const app = electron.app;
+    const dialog = electron.dialog;
+    const mainWindow = electron.mainWindow;
+
+    const filePath = path.join(app.getPath("desktop"), fileName);
+    const result = await dialog.showSaveDialog(mainWindow, { 
+        defaultPath: filePath 
+    });
+    //TODO create callback for writeFile function
+    fs.writeFile(result.filePath, data, function(err) {
+        if(err) {
+            return console.log(err);
+        }
+        console.log("The file was saved!");
+    }); 
 }

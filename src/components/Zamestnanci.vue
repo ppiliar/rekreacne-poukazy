@@ -4,6 +4,9 @@
       <div class="controls">
         <el-button class="control-button" v-on:click="add" icon="el-icon-plus">Pridať</el-button>
       </div>
+      <div class="export">
+        <el-button type="primary" class="export-button" v-on:click="exportExcel">Export</el-button>
+      </div>
     </el-header>
     <el-main>
       <div class="table">
@@ -35,6 +38,7 @@
 <script>
 import db from "../scripts/db.js";
 import { bus } from "../main.js";
+import createExcel from "../scripts/excelExport.js";
 
 export default {
   name: "zamestnanci",
@@ -83,6 +87,11 @@ export default {
     },
     sortPriezvisko: function(a, b) {
       return a.Priezvisko.localeCompare(b.Priezvisko, "sk");
+    },
+    exportExcel: function() {
+      const ipc = require('electron').ipcRenderer;
+      //ipc.send('export-to-file');
+      createExcel();
     }
   }
 };
@@ -93,15 +102,11 @@ export default {
   padding: 5px 20px 10px 20px;
   background-color: #fff;
 }
-.control-button {
-  float: left;
-  border: 1px solid gray;
-  margin: 0 auto;
-}
 .el-header {
+  display: flex;
+  justify-content: space-between;
   background-color: #b3c0d1;
   color: #333;
-  text-align: center;
   line-height: 60px;
 }
 .el-main {
@@ -113,10 +118,13 @@ export default {
 .search {
   align-items: left;
 }
-.controls {
-  height: 100%;
-  display: flex;
-  align-items: center;
+.control-button {
+  border: 1px solid gray;
+  margin: 0 auto;
+}
+.export-button {
+  border: 1px solid gray;
+  margin: 0 auto;
 }
 </style>
 
