@@ -5,7 +5,7 @@ import {
   createProtocol,
   installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
-import db from './scripts/db';
+import db from './scripts/db'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // const used for pdf print
@@ -41,6 +41,9 @@ function createWindow () {
     webPreferences: {
     nodeIntegration: true,
     devTools: isDevelopment //disable devTools in production build
+    //secure ??
+    //contextIsolation: true,
+    //sandbox: true
   } })
 
   win.on('page-title-updated', (evt) => {
@@ -117,13 +120,13 @@ ipc.on('print-to-pdf', function(event) {
   const pdfPath = path.join(os.tmpdir(), 'print.pdf');
   const win = BrowserWindow.fromWebContents(event.sender);
 
-  win.webContents.printToPDF({}, function(error, data){
-      if(error) return console.log(error.message);
-
-      fs.writeFile(pdfPath, data, function(err) {
-          if(err) return console.log(err.message);
-          shell.openExternal('file://'+pdfPath);
-          event.sender.send('wrote-pdf', pdfPath);
-      })
+  win.webContents.printToPDF({}).then(data => {
+    fs.writeFile(pdfPath, data, function(err) {
+      if(err) return console.log(err.message);
+      shell.openExternal('file://'+pdfPath);
+      event.sender.send('wrote-pdf', pdfPath);
+  })
+  }).catch(error => {
+    console.log(error)
   })
 });
