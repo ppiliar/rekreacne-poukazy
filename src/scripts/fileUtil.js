@@ -54,11 +54,17 @@ export async function writeFile(fileName, data) {
     const result = await dialog.showSaveDialog(mainWindow, { 
         defaultPath: filePath 
     });
+
+    //How to writeFile multiple times 
+    const file = fs.createWriteStream(result.filePath);
+    file.write(data);
+    file.end();
+    file.close();
     //TODO create callback for writeFile function
-    fs.writeFile(result.filePath, data, function(err) {
+    /*file.writeFile(result.filePath, data, function(err) {
         if(err) {
             return console.log(err);
         }
         console.log("The file was saved!");
-    }); 
+    }); */
 }

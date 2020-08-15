@@ -5,7 +5,7 @@ import {
   createProtocol,
   installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
-import db from './scripts/db'
+import db from './scripts/db';
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // const used for pdf print
@@ -16,16 +16,6 @@ const electron = require('electron')
 const ipc = electron.ipcMain
 const shell = electron.shell
 
-// Change default appData location to startup location of portable app
-import { createPortableAppDataFolder, copyFromRoaming } from './scripts/fileUtil'
-if(!isDevelopment){
-  let portablePath = path.join(process.env.PORTABLE_EXECUTABLE_DIR, "rekreacne-data")
-  createPortableAppDataFolder(portablePath)
-  copyFromRoaming(app.getPath('userData'), portablePath) // copy exitsing db from not portable installation
-  app.setPath("appData", portablePath)
-  app.setPath("userData", portablePath)
-}
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
@@ -33,13 +23,14 @@ let win
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true, standard: true } }])
 
-
 function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({ width: 900, height: 600, 
     title: 'Rekreačné poukazy',
     webPreferences: {
-    nodeIntegration: true,
+    // Use pluginOptions.nodeIntegration, leave this alone 
+    // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info 
+    nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
     devTools: isDevelopment //disable devTools in production build
     //secure ??
     //contextIsolation: true,
@@ -120,13 +111,13 @@ ipc.on('print-to-pdf', function(event) {
   const pdfPath = path.join(os.tmpdir(), 'print.pdf');
   const win = BrowserWindow.fromWebContents(event.sender);
 
-  win.webContents.printToPDF({}).then(data => {
-    fs.writeFile(pdfPath, data, function(err) {
-      if(err) return console.log(err.message);
-      shell.openExternal('file://'+pdfPath);
-      event.sender.send('wrote-pdf', pdfPath);
-  })
-  }).catch(error => {
-    console.log(error)
+  win.webContents.printToPDF({}, function(error, data){
+      if(error) return console.log(error.message);
+
+      fs.writeFile(pdfPath, data, function(err) {
+          if(err) return console.log(err.message);
+          shell.openExternal('file://'+pdfPath);
+          event.sender.send('wrote-pdf', pdfPath);
+      })
   })
 });
