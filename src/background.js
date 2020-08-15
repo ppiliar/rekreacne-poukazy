@@ -28,8 +28,13 @@ function createWindow () {
   win = new BrowserWindow({ width: 900, height: 600, 
     title: 'Rekreačné poukazy',
     webPreferences: {
-    nodeIntegration: true,
-    devTools: false //disable devTools in production build
+    // Use pluginOptions.nodeIntegration, leave this alone 
+    // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info 
+    nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+    devTools: isDevelopment //disable devTools in production build
+    //secure ??
+    //contextIsolation: true,
+    //sandbox: true
   } })
 
   win.on('page-title-updated', (evt) => {
