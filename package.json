@@ -15,20 +15,20 @@
   },
   "main": "background.js",
   "dependencies": {
-    "better-sqlite3": "^5.4.2",
-    "core-js": "^3.6.5",
-    "element-ui": "^2.13.2",
-    "reset-css": "^4.0.1",
-    "vue": "^2.6.11"
+    "better-sqlite3": "^7.1.1",
+    "core-js": "^3.7.0",
+    "element-ui": "^2.14.1",
+    "reset-css": "^5.0.1",
+    "vue": "^2.6.12"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.2.3",
-    "@vue/cli-service": "~4.2.3",
-    "electron": "^7.3.2",
-    "sass": "^1.26.10",
-    "sass-loader": "^7.2.0",
-    "vue-cli-plugin-electron-builder": "^2.0.0-rc.4",
-    "vue-template-compiler": "^2.6.11"
+    "@vue/cli-plugin-babel": "~4.5.8",
+    "@vue/cli-service": "~4.5.8",
+    "electron": "^10.1.5",
+    "sass": "^1.29.0",
+    "sass-loader": "^10.1.0",
+    "vue-cli-plugin-electron-builder": "^2.0.0-rc.5",
+    "vue-template-compiler": "^2.6.12"
   },
   "productName": "Rekreačné poukazy"
 }
