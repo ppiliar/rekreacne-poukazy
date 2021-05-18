@@ -280,4 +280,8 @@ function fetchZamData(id) {
   justify-content: flex-end;
   align-items: center;
 }
+.controls{
+  display: inline-flex;
+  align-items: center;
+}
 </style>

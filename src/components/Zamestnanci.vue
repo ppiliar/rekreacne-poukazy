@@ -67,20 +67,21 @@ export default {
       this.tableData = db.getZamestnanci();
     },
     deleteBox: function(id, msg) {
-      const {remote} = require('electron')
-      const dialog   = remote.dialog
+      const {remote} = require('electron');
+      const dialog   = remote.dialog;
 
-      let win = remote.getCurrentWindow()
+      let win = remote.getCurrentWindow();
 
-      let options = {}
-      options.buttons = ["&Áno","&Nie"]
+      let options = {};
+      options.buttons = ["&Áno","&Nie"];
       options.message = "Naozaj odstrániť " + msg;
-      dialog.showMessageBox(win, options, res => {
-        if (res === 0) {
+      console.log(dialog);
+      dialog.showMessageBox(win, options).then(result => {
+        if (result.response === 0) {
           db.removeZamestnanec(id);
           this.updateTable();
         }
-      })
+      });
     },
     sortMeno: function(a, b) {
       return a.Meno.localeCompare(b.Meno, "sk");
