@@ -1,8 +1,9 @@
 
 // appData initialization
-import checkDataFiles from './fileUtil.js';
+import {checkDataFiles} from './fileUtil.js';
 
 const electron = require('electron');
+
 checkDataFiles(getUserDataPath());
 
 export function getUserDataPath(){
