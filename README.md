@@ -5,6 +5,10 @@
 
 Electron aplikácia na evidenciu preplatených rekreačných poukazov 
 
+## Screenshots
+
+![Zamestnanci](docs/rekre.png)
+![Doklady](docs/rekre1.png)
 ## Project setup
 ```
 npm install
